@@ -83,14 +83,12 @@ public class ATM {
                         System.out.println("You cant withdraw a negative amount! Please enter a positive amount" + exitMsg);
                         amount=scanner.nextDouble();
                         scanner.nextLine();
-                        if(amount == 0) break;
                     }
                     if(amount == 0) break;
                     while (accounts.get(i).getCard().getBalance() < amount || amount < 0) {
                         System.out.println("You cant withdraw more than you have or negative amount! Please enter new amount" + exitMsg);
                         amount = scanner.nextDouble();
                         scanner.nextLine();
-                        if(amount == 0) break;
                     }
                     if(amount == 0) break;
                     accounts.get(i).getCard().withdraw(amount);
@@ -105,7 +103,6 @@ public class ATM {
                         System.out.println("You cant deposit a negative amount! Please enter a positive amount" + exitMsg);
                         amount=scanner.nextDouble();
                         scanner.nextLine();
-                        if(amount == 0) break;
                     }
                     if(amount == 0) break;
                     accounts.get(i).getCard().deposit(amount);
