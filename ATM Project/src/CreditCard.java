@@ -23,10 +23,6 @@ public class CreditCard {
         this.balance = balance;
     }
 
-    public boolean isValidNumber(String number){
-        return number.length() == 16;
-    }
-
     public void withdraw(double amount){
         this.balance -= amount;
     }

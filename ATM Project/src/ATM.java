@@ -19,13 +19,14 @@ public class ATM {
         accounts.add(new Account("sezermehmed", new CreditCard("1234",0)));
         accounts.add(new Account("ivanivanov", new CreditCard("0000",1000)));
         accounts.add(new Account("georgigeorgiev", new CreditCard("9876",500)));
+        accounts.add(new Account("nikinikolov", new CreditCard("5678", 2000)));
     }
 
-    public boolean isAccountInSystem(String name) {
+    public int isAccountInSystem(String name) {
         for (int i = 0; i < accounts.size(); i++) {
-            if (accounts.get(i).getName().equals(name)) return true;
+            if (accounts.get(i).getName().equals(name)) return i;
         }
-        return false;
+        return -1;
     }
 
     public void run() {
@@ -33,20 +34,24 @@ public class ATM {
         initializeCommands();
         Scanner scanner = new Scanner(System.in);
         String command = "";
+        String exitMsg = " or enter 0 to exit to the Main Menu:";
         double amount;
         while (true) {
-            System.out.println("Welcome to the ATM application! Please enter your name: ");
+            System.out.println("Welcome to the ATM application! Please enter your name or enter exit to quit the application: ");
             command = scanner.next();
-            while (!isAccountInSystem(command)) {
-                System.out.println("Name not found in system. Please enter new name:");
+            if(command.equals("exit")) {
+                System.out.println("Exiting ATM application...");
+                return;
+            }
+            while (isAccountInSystem(command) < 0) {
+                System.out.println("Name not found in system. Please enter new name or enter exit to quit the application:");
                 command = scanner.next();
+                if(command.equals("exit")){
+                    System.out.println("Exiting ATM application...");
+                    return;
+                }
             }
-            int i = 0;
-            if (command.equals("ivanivanov")) {
-                i = 1;
-            } else if (command.equals("georgigeorgiev")) {
-                i = 2;
-            }
+            int i = isAccountInSystem(command);
             System.out.println("Welcome " + accounts.get(i).getName() + "!");
             System.out.println("Please enter your PIN:");
             int tries = 3;
@@ -70,61 +75,72 @@ public class ATM {
             }
             while (!command.equals("logout")) {
                 if (command.equals("withdraw")) {
-                    System.out.println("Enter the amount of money you want to withdraw:");
+                    System.out.println("Enter the amount of money you want to withdraw" + exitMsg);
                     amount = scanner.nextDouble();
                     scanner.nextLine();
+                    if(amount == 0) break;
                     while(amount < 0){
-                        System.out.println("You cant withdraw a negative amount! Please enter a positive amount:");
+                        System.out.println("You cant withdraw a negative amount! Please enter a positive amount" + exitMsg);
                         amount=scanner.nextDouble();
+                        scanner.nextLine();
+                        if(amount == 0) break;
                     }
-                    while (accounts.get(i).getCard().getBalance() < amount) {
-                        System.out.println("You cant withdraw more than you have! Please enter new amount:");
+                    if(amount == 0) break;
+                    while (accounts.get(i).getCard().getBalance() < amount || amount < 0) {
+                        System.out.println("You cant withdraw more than you have or negative amount! Please enter new amount" + exitMsg);
                         amount = scanner.nextDouble();
                         scanner.nextLine();
+                        if(amount == 0) break;
                     }
+                    if(amount == 0) break;
                     accounts.get(i).getCard().withdraw(amount);
                     System.out.println("Successfully withdrew " + amount + " lv.");
                 }
                 if (command.equals("deposit")) {
-                    System.out.println("Enter the amount of money you want to deposit:");
+                    System.out.println("Enter the amount of money you want to deposit" + exitMsg);
                     amount = scanner.nextDouble();
                     scanner.nextLine();
+                    if(amount == 0) break;
                     while(amount < 0){
-                        System.out.println("You cant deposit a negative amount! Please enter a positive amount:");
+                        System.out.println("You cant deposit a negative amount! Please enter a positive amount" + exitMsg);
                         amount=scanner.nextDouble();
+                        scanner.nextLine();
+                        if(amount == 0) break;
                     }
+                    if(amount == 0) break;
                     accounts.get(i).getCard().deposit(amount);
                     System.out.println("Successfully deposited " + amount + " lv.");
                 }
                 if (command.equals("changepin")) {
-                    System.out.println("Enter new PIN:");
+                    System.out.println("Enter new PIN" + exitMsg);
                     command = scanner.next();
+                    if(command.equals("0")) break;
                     while(command.length() != 4 || !command.chars().allMatch(Character::isDigit)){
-                        System.out.println("PIN must be 4-digits long! Example PIN: \"2304\". Please enter a valid input!");
+                        System.out.println("PIN must be 4-digits long! Example PIN: \"2304\". Please enter a valid input" + exitMsg);
                         command=scanner.next();
+                        if(command.equals("0")) break;
                     }
+                    if(command.equals("0")) break;
                     accounts.get(i).getCard().setPIN(command);
                     System.out.println("PIN changed successfully!");
                 }
                 if (command.equals("transfer")) {
-                    System.out.println("Enter the name of the receiver:");
+                    System.out.println("Enter the name of the receiver" + exitMsg);
                     command = scanner.next();
-                    while (!isAccountInSystem(command)) {
-                        System.out.println("Name not found in system. Please enter new name:");
+                    if(command.equals("0")) break;
+                    while (isAccountInSystem(command) < 0) {
+                        System.out.println("Name not found in system. Please enter new name" + exitMsg);
                         command = scanner.next();
+                        if(command.equals("0")) break;
                     }
-                    int j = 0;
-                    if (command.equals("ivanivanov")) {
-                        j = 1;
-                    } else if (command.equals("georgigeorgiev")) {
-                        j = 2;
-                    }
+                    if(command.equals("0")) break;
+                    int j = isAccountInSystem(command);
                     if (i != j) {
                         System.out.println("Enter the amount you want to send to " + accounts.get(j).getName());
                         amount = scanner.nextDouble();
                         scanner.nextLine();
-                        while(amount < 0){
-                            System.out.println("You cant send negative amount! Please enter a valid amount:");
+                        while(amount <= 0){
+                            System.out.println("You cant send negative amount! Please enter a positive amount:");
                             amount = scanner.nextDouble();
                         }
                         if(accounts.get(i).getCard().getBalance() >= amount) {
@@ -145,7 +161,7 @@ public class ATM {
                     System.out.println("Exiting ATM application...");
                     return;
                 }
-                System.out.println("Enter what would you like to do now:");
+                System.out.println("Please enter what would you like to do now:");
                 command = scanner.next();
                 while (!commands.contains(command)) {
                     System.out.println("Invalid command! Please enter a valid command:");
